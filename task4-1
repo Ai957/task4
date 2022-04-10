@@ -1,0 +1,101 @@
+<?php
+
+session_start();
+
+//Clean function
+function Clean($input){
+    $input = trim($input);
+    $input = strip_tags($input);
+    $input = stripslashes($input);
+    return $input;
+}
+
+if($_SERVER['REQUEST_METHOD'] == "POST"){
+
+    # Form inputs
+   $title = Clean($_POST['title']);
+   $content = Clean($_POST['content']);
+   //image file
+   $file = Clean($_POST['image']);
+
+   //Errors Array
+  $errors = []; 
+
+  # Validate title 
+  if(empty($title)){
+
+    $errors['title']  = "title is required!"; 
+  } 
+  elseif(!is_string($title)){
+        $errors['title']  = "Title must be string"; 
+    }
+
+  # VALIDATE CONTENT 
+  if(empty($content)){
+    $errors['content'] = "Content is Required"; 
+  } elseif (strlen((string)$content)>50) {
+    $errors['content'] = "Content must be less than 50 characters";
+  }
+
+      # Validate image file
+  if (!empty($_FILES['image']['name'])) {
+
+        $name    = $_FILES['image']['name'];
+        $temPath = $_FILES['image']['tmp_name'];
+        //$size    = $_FILES['file']['size'];
+        $type    = $_FILES['image']['type'];
+    
+
+        $typesInfo  =  explode('/', $type);   // convert string to array 
+        $extension  =  strtolower( end($typesInfo));      // get last element in array  
+
+        $allowedExtension = ['png', 'jpeg', 'jpg','gif'];   // allowed Extension images
+
+        if (in_array($extension, $allowedExtension)) {
+
+            # Create Final Name ... 
+            //$FinalName = time() . rand() . '.' . $extension;
+
+            $disPath = 'formFiles/'; //. $FinalName;
+
+            if (move_uploaded_file($temPath, $disPath)) {
+
+                echo 'Image Uploaded';
+            } else {
+                echo 'Error, Please Try Again';
+            }
+        } else {
+            echo 'Must be png,jpeg,jpg,gif Extensions';
+        }
+    } else {
+        echo 'Image is Required';
+    }
+    
+    # Check ERRORS 
+    if(count($errors) > 0 ){
+
+        foreach($errors as $key => $value){
+            echo '- '.$key.' : '.$value.'<br>'.'<br>';  
+        }
+
+     }else{
+         $title = $_SESSION['title'];
+         $content = $_SESSION['content'];
+         $file = $_SESSION['file'];
+     } 
+}
+
+?>
+<form action="<?php echo $_SERVER['PHP_SELF'];?>"   method="POST"">
+<br><br><br>
+<label>Blog Form</label>
+<br><br>
+<label>Title: <input type="text" name="title"></label>
+<br><br>
+<label>Content: </label> <br><br>
+<textarea cols="50" rows="5" name="content" ></textarea>
+<br><br>
+<label>Image: <input type="file" name="image"></label>
+<br><br><br>
+<input type="submit" value="Submit" onclick="validation()" formtarget="_blank">
+</form> 
