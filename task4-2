@@ -1,0 +1,22 @@
+<?php
+session_start();
+
+ $file =   fopen('info.txt','r')  or die("can't open file");
+
+echo   fgetc($file); 
+
+?>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Blog</title>
+</head>
+
+<body>
+<div class="about-section">
+  <h1><?php echo $_SESSION['title'];?></h1><br><br>
+  <p><?php echo $_SESSION['content'];?></p><br>
+  <p><?php echo $_SESSION['image'];?></p><br><br>
+</div>
+</body>
+</html>
